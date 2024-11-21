@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'blood.jpg' %}");
+            background-size: cover;
+            padding: 30px;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table, .table th, .table td {
+            border: 1px solid #ddd;
+        }
+        .table th, .table td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Welcome to your Dashboard, {{ patient.user.first_name }} {{ patient.user.last_name }}!</h2>
+
+    <h3>Patient Details</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                {% comment %} <th>Full Name</th> {% endcomment %}
+                <th>Blood Type</th>
+                <th>Contact Number</th>
+                <th>Address</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ patient.user.username }}</td>
+                {% comment %} <td>{{ patient.user.first_name }} {{ patient.user.last_name }}</td> {% endcomment %}
+                <td>{{ patient.blood_type }}</td>
+                <td>{{ patient.contact_number }}</td>
+                <td>{{ patient.address }}</td>
+                <td>{{ patient.age }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{% url 'patient_logout' %}">Logout</a>
+    </div>
+</div>
+
+</body>
+</html>

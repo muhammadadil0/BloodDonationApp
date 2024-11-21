@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Bank Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #ff4d4d;
+            color: #fff;
+            padding: 15px;
+            text-align: left;
+            font-size: 24px;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            color: #fff;
+            display: block;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .main {
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .section-header {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .blood-type {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .metric {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        .metric .icon {
+            font-size: 20px;
+            color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <span>Blood Bank Management System</span>
+    <span style="float: right;"><a href="{% url 'admin_logout' %}" style="color: #fff;">Logout</a></span>
+</div>
+
+<div class="sidebar">
+    <a href="#">Home</a>
+    <a href="#">Donor</a>
+    <a href="#">Patient</a>
+    <a href="#">Donations</a>
+    <a href="#">Blood Requests</a>
+    <a href="#">Request History</a>
+    <a href="#">Blood Stock</a>
+</div>
+
+<div class="main">
+    <div class="section-header">Blood Stock</div>
+    <div class="card-grid">
+        {% for blood_type, count in blood_stock.items %}
+            <div class="card">
+                <div class="blood-type">{{ blood_type }}</div>
+                <div class="icon">💉</div>
+                <div>{{ count }}</div>
+            </div>
+        {% empty %}
+            <p>No blood stock data available.</p>
+        {% endfor %}
+    </div>
+
+    <div class="section-header">Donor Section</div>
+    <div class="card-grid">
+        <div class="card">
+            <div>Total Donors</div>
+            <div class="metric">
+                <span>{{ total_donors }}</span>
+                <span class="icon">👥</span>
+            </div>
+        </div>
+        <div class="card">
+            <div>Total Blood Units</div>
+            <div class="metric">
+                <span>{{ total_blood_units }} ml</span>
+                <span class="icon">💧</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">Patient Section</div>
+    <div class="card-grid">
+        <div class="card">
+            <div>Total Requests</div>
+            <div class="metric">
+                <span>{{ total_requests }}</span>
+                <span class="icon">🔄</span>
+            </div>
+        </div>
+        <div class="card">
+            <div>Approved Requests</div>
+            <div class="metric">
+                <span>{{ approved_requests }}</span>
+                <span class="icon">✔️</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Login</title>
+    {% load static %}
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            background: linear-gradient(45deg, #e74c3c, #ffffff, #e74c3c, #ffffff); /* Blood red and white gradient */
+            background-size: 400% 400%;
+            animation: gradientMove 10s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            flex-direction: column;
+        }
+
+        /* Keyframes for Background Animation */
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Container Styling */
+        .container {
+            width: 400px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        /* Fade-In Effect for Page Load */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50; /* Deep blue for titles */
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-field {
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .input-field:focus {
+            border-color: #e74c3c; /* Highlight on focus with blood red */
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn {
+            background-color: #e74c3c; /* Blood red color for button */
+            color: #ffffff;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #c0392b; /* Darker red on hover */
+        }
+
+        /* Register Link Styling */
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #c0392b; /* Darker red hover state */
+        }
+
+        /* Alert Styling */
+        .messages {
+            background-color: #eaf6ff; /* Light blue for alerts */
+            color: #e74c3c; /* Blood red text */
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .messages p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Header -->
+    <header>
+        <h2></h2>
+    </header>
+
+    <!-- Patient Login Form -->
+    <div class="container">
+        <h2>Patient Login</h2>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form action="{% url 'patient_login' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="username" class="input-field" placeholder="Enter your username" required>
+            <input type="password" name="password" class="input-field" placeholder="Enter your password" required>
+            <button type="submit" class="btn">Login</button>
+        </form>
+
+        <div class="register-link">
+            <p>Not registered yet? <a href="{% url 'patient_register' %}">Register here</a></p>
+        </div>
+    </div>
+</body>
+</html>
+

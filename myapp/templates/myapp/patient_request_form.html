@@ -1,0 +1,34 @@
+<!-- patient_request_form.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Patient Request</title>
+</head>
+<body>
+
+<h2>Create Patient Request</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <label for="patient_name">Patient Name:</label>
+    <input type="text" name="patient_name" required><br><br>
+    
+    <label for="blood_type">Blood Type:</label>
+    <input type="text" name="blood_type" required><br><br>
+    
+    <label for="contact_number">Contact Number:</label>
+    <input type="text" name="contact_number" required><br><br>
+    
+    <label for="status">Status:</label>
+    <select name="status">
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+    </select><br><br>
+    
+    <button type="submit">Create Request</button>
+</form>
+
+</body>
+</html>

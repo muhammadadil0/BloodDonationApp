@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Register</title>
+    {% load static %}
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(to bottom, #3498db, #ffffff);
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: #333;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        /* Container Styling */
+        .container {
+            width: 450px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease-in-out;
+            overflow-y: auto;
+            max-height: 90vh;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-field {
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .input-field:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Add styles for the map */
+        #map {
+            height: 400px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .messages {
+            background-color: #eaf6ff;
+            color: #3498db;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #2980b9;
+        }
+    </style>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Leaflet Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>Donor Register</h2>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form action="{% url 'donor_register' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="username" class="input-field" placeholder="Enter your username" required>
+            <input type="email" name="email" class="input-field" placeholder="Enter your email" required>
+            <input type="password" name="password" class="input-field" placeholder="Enter your password" required>
+            <input type="password" name="confirm_password" class="input-field" placeholder="Confirm your password" required>
+            <input type="text" name="blood_type" class="input-field" placeholder="Enter your blood type (e.g., A+)" required>
+            <input type="text" name="contact_number" class="input-field" placeholder="Enter your contact number" required>
+            <input type="text" id="address" name="address" class="input-field" placeholder="Enter your address" required>
+            <input type="number" name="age" class="input-field" placeholder="Enter your age" required>
+
+            <!-- Map for location selection -->
+            <div id="map"></div>
+            <input type="hidden" name="lat" id="lat">
+            <input type="hidden" name="lon" id="lon">
+
+            <button type="submit" class="btn">Register</button>
+        </form>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="{% url 'donor_login' %}">Login here</a></p>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Leaflet Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        // Initialize map centered on a default location
+        var map = L.map('map').setView([51.505, -0.09], 13);  // Default coordinates (e.g., London)
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add a marker
+        var marker = L.marker([51.505, -0.09]).addTo(map);
+
+        // Function to update the address input field
+        function updateAddress(lat, lon) {
+            var geocoder = L.Control.Geocoder.nominatim();
+            geocoder.reverse([lat, lon], 13, function(results) {
+                var address = results[0] ? results[0].name : 'No address found';
+                document.getElementById('address').value = address;
+            });
+        }
+
+        // When user clicks on the map, update marker and store coordinates in hidden inputs
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lon = e.latlng.lng;
+
+            // Update marker position
+            marker.setLatLng(e.latlng);
+
+            // Set hidden input fields with the lat and lon values
+            document.getElementById('lat').value = lat;
+            document.getElementById('lon').value = lon;
+
+            // Update the address field using reverse geocoding
+            updateAddress(lat, lon);
+        });
+
+        // Add geocoder control (search box)
+        var geocoder = L.Control.Geocoder.nominatim({
+            geocodeByQuery: true, // Allow searching by place name (country/city)
+            placeholder: "Search for a location...",
+            showResultIcons: false, // Hide icons in search results (optional)
+        }).addTo(map);
+
+        // When a user selects a location, update the map and address
+        geocoder.on('markgeocode', function(e) {
+            var lat = e.geocode.center.lat;
+            var lon = e.geocode.center.lng;
+
+            // Update marker position
+            marker.setLatLng([lat, lon]);
+
+            // Update the hidden lat, lon values
+            document.getElementById('lat').value = lat;
+            document.getElementById('lon').value = lon;
+
+            // Get the address and populate the address field
+            updateAddress(lat, lon);
+        });
+    </script>
+</body>
+</html>
+
