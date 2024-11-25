@@ -24,4 +24,7 @@ urlpatterns = [
     path('makerequest/', views.make_request, name='makerequest'),
     path('my_request/', views.my_request, name='my_request'),
     path('logout/', LogoutView.as_view(), name='logout'),  # Add the logout URL pattern
+    path('contact/', views.contact_us, name='contact_us'),
+     
+    path('contact-us/', views.contact_us, name='contact_us'),
 ]

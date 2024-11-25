@@ -7,20 +7,31 @@
         .label {
             color: white;
             padding: 8px;
+            border-radius: 4px;
         }
         .success { background-color: #4CAF50; } /* Green */
         .info { background-color: #2196F3; } /* Blue */
         .warning { background-color: #ff9800; } /* Orange */
         .danger { background-color: #f44336; } /* Red */
         .other { background-color: #e7e7e7; color: black; } /* Gray */
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
     </style>
+    <!-- Bootstrap 4.5 CSS for additional UI elements -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 
 <br><br>
 <div class="container">
-    <h4 class="text-center">My Blood Request</h4><br>
+    <h4 class="text-center mb-4">My Blood Request History</h4>
+    
+    <div class="alert alert-info" role="alert">
+        <strong>Note:</strong> This table contains all your blood requests. You can track the status of each request here.
+    </div>
+    
     <table class="table table-light table-hover table-bordered table-striped">
-        <thead class="bg-info">
+        <thead class="bg-info text-white">
             <tr>
                 <th scope="col">Patient Name</th>
                 <th scope="col">Patient Age</th>
@@ -32,24 +43,31 @@
             </tr>
         </thead>
         <tbody>
-            {% for t in blood_request %}
+            {% for t in makerequest %}
             <tr>
                 <td>{{ t.patient_name }}</td>
                 <td>{{ t.patient_age }}</td>
                 <td>{{ t.reason }}</td>
-                <td>{{ t.bloodgroup }}</td>
-                <td>{{ t.unit }}</td>
+                <td>{{ t.blood_group }}</td>
+                <td>{{ t.unit }} ml</td>
                 <td>{{ t.date }}</td>
-                {% if t.status == 'Approved' %}
-                <td><span class="label warning">Approved</span></td>
-                {% elif t.status == 'Rejected' %}
-                <td><span class="label success">Rejected</span></td>
-                {% else %}
-                <td><span class="label info">Pending</span></td>
-                {% endif %}
+                <td>
+                    {% if t.status == 'Approved' %}
+                    <span class="label success">Approved</span>
+                    {% elif t.status == 'Rejected' %}
+                    <span class="label danger">Rejected</span>
+                    {% else %}
+                    <span class="label info">Pending</span>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<!-- Optional Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 {% endblock content %}

@@ -2,25 +2,40 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Patient, Donor, BloodDonate
+from .models import BloodRequest, Patient, Donor, BloodDonate
 from django.contrib import messages
 from django.urls import reverse
 from django.db import models  # Import models to use for aggregation
 from .models import PatientRequest
 from . import forms
 
-
+from .forms import BloodRequestForm, ContactUsForm 
 
 from django.shortcuts import render
+
 
 def home(request):
     return render(request, 'home.html')  # This should match the template you want to show
 
+
 def make_request(request):
-    return render(request, 'makerequest.html') 
+    if request.method == 'POST':
+        form = BloodRequestForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('patient_dashboard')  # Redirect to a success page
+    else:
+        form = BloodRequestForm()  # Initialize an empty form
+
+    return render(request, 'myapp/makerequest.html', {'request_form': form})
+
 
 def my_request(request):
-    return render(request, 'my_request.html') 
+    # Fetch all blood requests (modify as needed, e.g., filtering by the user)
+    makerequest = BloodRequest.objects.all()
+
+    # Pass the blood requests to the template
+    return render(request, 'myapp/my_request.html', {'makerequest': makerequest})
 
 # Improved Dashboard View to show blood group count for donors
 def donor_dashboard(request):
@@ -249,3 +264,15 @@ def patient_request_create(request):
         return redirect('dashboard')  # Redirect to the dashboard or wherever necessary
 
     return render(request, 'patient_request_form.html')  # Return the form if not POST
+
+def contact_us(request):
+    if request.method == 'POST':
+        form = ContactUsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your message has been sent successfully!')
+            return redirect('contact_us')  # Redirect back to the same page after successful form submission
+    else:
+        form = ContactUsForm()
+    
+    return render(request, '/Users/MUHAMMAD KAIF/Desktop/BloodManagementApp/myapp/templates/myapp/contact_us.html', {'form': form})

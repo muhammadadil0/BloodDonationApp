@@ -2,7 +2,19 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from . import models
+from .models import BloodRequest, ContactUs
 
+class BloodRequestForm(forms.ModelForm):
+    class Meta:
+        model = BloodRequest
+        fields = ['patient_name', 'patient_age', 'reason', 'blood_group', 'unit']
+        widgets = {
+            'patient_name': forms.TextInput(attrs={'class': 'input--style-5'}),
+            'patient_age': forms.NumberInput(attrs={'class': 'input--style-5'}),
+            'reason': forms.Textarea(attrs={'class': 'input--style-5'}),
+            'blood_group': forms.Select(attrs={'class': 'input--style-5'}),
+            'unit': forms.NumberInput(attrs={'class': 'input--style-5'}),
+        }
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}))
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Confirm your password'}))
@@ -36,3 +48,11 @@ class DonationForm(forms.ModelForm):
     class Meta:
         model=models.BloodDonate
         fields=['age','bloodgroup','disease','unit']
+
+class ContactUsForm(forms.ModelForm):
+    class Meta:
+        model = ContactUs
+        fields = ['name', 'email', 'message']
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
+        }

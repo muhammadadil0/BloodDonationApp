@@ -53,6 +53,31 @@ class PatientRequest(models.Model):
     def __str__(self):
         return f"Request by {self.patient_name} for {self.blood_type} blood"
         
+class BloodRequest(models.Model):
+    O = 'O'
+    A = 'A'
+    B = 'B'
+    AB = 'AB'
+
+    BLOOD_GROUP_CHOICES = [
+        (f'{O}+','O+'),
+        (f'{O}-','O-'),
+        (f'{A}+','A+'),
+        (f'{A}-','A-'),
+        (f'{B}+','B+'),
+        (f'{B}-','B-'),
+        (f'{AB}+','AB+'),
+        (f'{AB}-','AB-'),
+    ]
+
+    patient_name = models.CharField(max_length=100)
+    patient_age = models.IntegerField()
+    reason = models.TextField()
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
+    unit = models.IntegerField()  # Blood unit in ml
+
+    def __str__(self):
+        return f"Blood Request for {self.patient_name} ({self.blood_group})"
         
         
 class BloodDonate(models.Model): 
@@ -65,3 +90,10 @@ class BloodDonate(models.Model):
     date=models.DateField(auto_now=True)
     def __str__(self):
         return self.donor
+class ContactUs(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+
+    def __str__(self):
+        return f"Message from {self.name}"

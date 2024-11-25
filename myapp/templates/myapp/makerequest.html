@@ -1,9 +1,28 @@
-<!DOCTYPE html>
-<html>
+{% extends 'myapp/patient_base.html' %}
+{% block content %}
+{% load widget_tweaks %}
+{% load static %}
 <head>
-    <title>Make Request</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" media="all">
 </head>
-<body>
-    <h1>Blood Request Page</h1>
-</body>
-</html>
+<div class="page-wrapper bg-gra-03 p-t-45 p-b-50">
+    <div class="wrapper wrapper--w790">
+        <div class="card card-5">
+            <div class="card-heading">
+                <h2 class="title">MAKE BLOOD REQUEST</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" autocomplete="off" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ request_form.as_p }}  <!-- This will render the form fields -->
+
+                    <div>
+                        <button class="btn btn--radius-2 btn-danger" type="submit">REQUEST</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
