@@ -132,8 +132,6 @@
     </style>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <!-- Leaflet Geocoder CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 </head>
 <body>
     <div class="container">
@@ -173,68 +171,98 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <!-- Leaflet Geocoder JS -->
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
-        // Initialize map centered on a default location
-        var map = L.map('map').setView([51.505, -0.09], 13);  // Default coordinates (e.g., London)
+        // Initialize map centered on Pakistan with a zoom level of 6
+        var map = L.map('map').setView([30.3753, 69.3451], 6);  // Pakistan's approximate center
 
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Add a marker
-        var marker = L.marker([51.505, -0.09]).addTo(map);
+        // Add a draggable marker at the center
+        var marker = L.marker([30.3753, 69.3451], { draggable: true }).addTo(map);
 
-        // Function to update the address input field
+        // Reverse geocoding function to update address field
         function updateAddress(lat, lon) {
-            var geocoder = L.Control.Geocoder.nominatim();
-            geocoder.reverse([lat, lon], 13, function(results) {
-                var address = results[0] ? results[0].name : 'No address found';
-                document.getElementById('address').value = address;
-            });
+            var url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+
+            // Fetch address data from the Nominatim API
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.address) {
+                        let address = '';
+
+                        // Check for available address components and build the address string
+                        if (data.address.road) {
+                            address += data.address.road + ', ';
+                        }
+                        if (data.address.city) {
+                            address += data.address.city + ', ';
+                        } else if (data.address.town) {
+                            address += data.address.town + ', ';
+                        } else if (data.address.village) {
+                            address += data.address.village + ', ';
+                        }
+
+                        if (data.address.state) {
+                            address += data.address.state + ', ';
+                        }
+
+                        if (data.address.country) {
+                            address += data.address.country;
+                        }
+
+                        if (!address) {
+                            address = 'Address not found';
+                        }
+
+                        document.getElementById('address').value = address;  // Autofill address field
+                    } else {
+                        document.getElementById('address').value = 'Address not found';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching address:', error);
+                    document.getElementById('address').value = 'Address not found';
+                });
         }
 
-        // When user clicks on the map, update marker and store coordinates in hidden inputs
+        // Update marker and hidden inputs when the marker is dragged
+        marker.on('dragend', function(e) {
+            var lat = marker.getLatLng().lat;
+            var lon = marker.getLatLng().lng;
+
+            // Update hidden latitude and longitude inputs
+            document.getElementById('lat').value = lat;
+            document.getElementById('lon').value = lon;
+
+            // Update address field
+            updateAddress(lat, lon);
+
+            // Zoom in after dragging the marker
+            map.setView([lat, lon], 15);
+        });
+
+        // Map click event to place a marker and update address
         map.on('click', function(e) {
             var lat = e.latlng.lat;
             var lon = e.latlng.lng;
 
-            // Update marker position
-            marker.setLatLng(e.latlng);
-
-            // Set hidden input fields with the lat and lon values
-            document.getElementById('lat').value = lat;
-            document.getElementById('lon').value = lon;
-
-            // Update the address field using reverse geocoding
-            updateAddress(lat, lon);
-        });
-
-        // Add geocoder control (search box)
-        var geocoder = L.Control.Geocoder.nominatim({
-            geocodeByQuery: true, // Allow searching by place name (country/city)
-            placeholder: "Search for a location...",
-            showResultIcons: false, // Hide icons in search results (optional)
-        }).addTo(map);
-
-        // When a user selects a location, update the map and address
-        geocoder.on('markgeocode', function(e) {
-            var lat = e.geocode.center.lat;
-            var lon = e.geocode.center.lng;
-
-            // Update marker position
+            // Move the marker to the clicked location
             marker.setLatLng([lat, lon]);
 
-            // Update the hidden lat, lon values
+            // Update hidden latitude and longitude inputs
             document.getElementById('lat').value = lat;
             document.getElementById('lon').value = lon;
 
-            // Get the address and populate the address field
+            // Update address field
             updateAddress(lat, lon);
+
+            // Zoom in after clicking the map
+            map.setView([lat, lon], 15);
         });
     </script>
 </body>
 </html>
-

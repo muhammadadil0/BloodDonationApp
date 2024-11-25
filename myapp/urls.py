@@ -26,7 +26,7 @@ urlpatterns = [
     path('patient_logout/', views.patient_logout, name='patient_logout'),
     path('patient-request/', views.patient_request_create, name='patient_request_create'),
     path('my_request/', views.my_request, name='my_request'),
-
+    path('makerequest/', views.make_request, name='makerequest'),
     # Additional URLs
     path('contact-us/', views.contact_us, name='contact_us'),
     path('all_donor_history/', views.all_donor_history, name='all_donor_history'),
