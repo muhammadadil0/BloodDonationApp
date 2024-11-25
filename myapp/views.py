@@ -12,6 +12,8 @@ from . import forms
 from .forms import BloodRequestForm, ContactUsForm 
 
 from django.shortcuts import render
+from django.db.models import Sum
+
 
 
 def home(request):
@@ -159,23 +161,30 @@ def donor_register(request):
 
 
 def donate_blood(request):
-    donation_form=forms.DonationForm()
-    if request.method=='POST':
-        donation_form=forms.DonationForm(request.POST)
-        if donation_form.is_valid():
-            blood_donate=donation_form.save(commit=False)
-            blood_donate.bloodgroup=donation_form.cleaned_data['bloodgroup']
-            donor= models.Donor.objects.get(user_id=request.user.id)
-            blood_donate.donor=donor
+    """Handle blood donation submission."""
+    if request.user.is_authenticated and hasattr(request.user, 'donor'):
+        donation_form = forms.DonationForm(request.POST or None)
+        if request.method == 'POST' and donation_form.is_valid():
+            blood_donate = donation_form.save(commit=False)
+            blood_donate.donor = Donor.objects.get(user=request.user)
             blood_donate.save()
-            return HttpResponseRedirect('donation_history')  
-    return render(request,'myapp/donate_blood.html',{'donation_form':donation_form})
+            messages.success(request, 'Donation submitted successfully.')
+            return redirect('donation_history')
+
+        return render(request, 'myapp/donate_blood.html', {'donation_form': donation_form})
+
+    messages.error(request, 'You must be logged in as a donor to donate blood.')
+    return redirect('home')
 
 def donation_history(request):
-    donor= Donor.objects.get(user_id=request.user.id)
-    donations=BloodDonate.objects.all().filter(donor=donor)
-    return render(request,'myapp/donation_history.html',{'donations':donations})
+    """Render the donation history for donors."""
+    if request.user.is_authenticated and hasattr(request.user, 'donor'):
+        donor = Donor.objects.get(user=request.user)
+        donations = BloodDonate.objects.filter(donor=donor)
+        return render(request, 'myapp/donation_history.html', {'donations': donations})
 
+    messages.error(request, 'You are not authorized to view this page.')
+    return redirect('home')
 
 
 
@@ -242,7 +251,11 @@ def admin_logout(request):
     return custom_logout(request, 'admin')
 
 def donor_logout(request):
-    return custom_logout(request, 'donor')
+    logout(request)
+    return redirect('home')
+
+
+
 def patient_request_create(request):
     if request.method == 'POST':
         # Handle form submission to create a new patient request
@@ -275,4 +288,22 @@ def contact_us(request):
     else:
         form = ContactUsForm()
     
-    return render(request, '/Users/MUHAMMAD KAIF/Desktop/BloodManagementApp/myapp/templates/myapp/contact_us.html', {'form': form})
+    return render(request, 'myapp/contact_us.html', {'form': form})
+
+def all_donor_history(request):
+    """View all donation histories for admin."""
+    if request.user.is_authenticated and request.user.is_staff:  # Ensure the user is an admin
+        donations = BloodDonate.objects.select_related('donor', 'donor__user').all()
+        return render(request, 'myapp/all_donor_history.html', {'donations': donations})
+    messages.error(request, 'You are not authorized to access this page.')
+    return redirect('home')
+
+def all_patient_history(request):
+    patients = Patient.objects.all()  # Modify as needed to filter patients
+    return render(request, 'myapp/all_patient_history.html', {'patients': patients})
+
+def blood_stock_view(request):
+    # Group by blood type and sum the units
+    blood_stock = BloodDonate.objects.values('bloodgroup').annotate(total_units=Sum('unit')).order_by('bloodgroup')
+    
+    return render(request, 'myapp/blood_stock.html', {'blood_stock': blood_stock})

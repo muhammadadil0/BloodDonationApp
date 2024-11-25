@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Stock</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* Include any custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header (navbar) */
+        .header {
+            background-color: #ff4d4d;
+            color: #fff;
+            padding: 15px;
+            text-align: left;
+            font-size: 24px;
+        }
+
+        .header a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            color: #fff;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        /* Main Content Area */
+        .main {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        .section-header {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* Blood Stock Table */
+        .blood-stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .blood-stock-table th, .blood-stock-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+
+        .blood-stock-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .blood-stock-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .blood-stock-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .blood-stock-table th, .blood-stock-table td {
+                padding: 10px;
+            }
+            .section-header {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <span>Blood Bank Management System</span>
+    <span style="float: right;"><a href="{% url 'admin_logout' %}">Logout</a></span>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'all_donor_history' %}">Donor</a>
+    <a href="{% url 'all_patient_history' %}">Patient</a>
+    <a href="#">Donations</a>
+    <a href="#">Blood Requests</a>
+    <a href="#">Request History</a>
+    <a href="{% url 'blood_stock' %}">Blood Stock</a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+    <div class="section-header">Blood Stock</div>
+
+    <table class="blood-stock-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Blood Group</th>
+                <th>Total Units</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in blood_stock %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ stock.bloodgroup }}</td>
+                <td>{{ stock.total_units }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="no-records">No blood stock data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    function toggleBloodStock() {
+        var stockSection = document.getElementById('bloodStockSection');
+        if (stockSection.style.display === 'none') {
+            stockSection.style.display = 'block';
+        } else {
+            stockSection.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>

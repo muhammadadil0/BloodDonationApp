@@ -16,12 +16,23 @@ class BloodRequestForm(forms.ModelForm):
             'unit': forms.NumberInput(attrs={'class': 'input--style-5'}),
         }
 class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}))
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Confirm your password'}))
-
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}),
+        label="Password"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm your password'}),
+        label="Confirm Password"
+    )
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'Enter a unique username'}),
+            'first_name': forms.TextInput(attrs={'placeholder': 'Enter your first name'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Enter your last name'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email address'}),
+        }
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -46,8 +57,14 @@ class UserRegistrationForm(forms.ModelForm):
 
 class DonationForm(forms.ModelForm):
     class Meta:
-        model=models.BloodDonate
-        fields=['age','bloodgroup','disease','unit']
+        model = models.BloodDonate
+        fields = ['age', 'bloodgroup', 'disease', 'unit']
+        widgets = {
+            'age': forms.NumberInput(attrs={'placeholder': 'Enter your age'}),
+            'bloodgroup': forms.Select(attrs={'placeholder': 'Select blood group'}),
+            'disease': forms.TextInput(attrs={'placeholder': 'Mention any diseases (if applicable)'}),
+            'unit': forms.NumberInput(attrs={'placeholder': 'Enter blood units to donate'}),
+        }
 
 class ContactUsForm(forms.ModelForm):
     class Meta:

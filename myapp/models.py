@@ -8,6 +8,22 @@ def validate_age(value):
     if value < 18 or value > 120:
         raise ValidationError('Age must be between 18 and 120.')
 
+class Person(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    blood_type = models.CharField(max_length=3)
+    contact_number = models.CharField(max_length=15)
+    address = models.TextField(blank=True, null=True)
+    age = models.IntegerField(validators=[validate_age])
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(
+        max_length=10, 
+        choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], 
+        null=True, 
+        blank=True
+    )
+
+
+
 class Patient(models.Model):
     # Link each Patient to a User instance
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # Removed null=True and blank=True to ensure each Patient has a linked user
