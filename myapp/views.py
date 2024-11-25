@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -15,6 +16,11 @@ from django.shortcuts import render
 def home(request):
     return render(request, 'home.html')  # This should match the template you want to show
 
+def make_request(request):
+    return render(request, 'makerequest.html') 
+
+def my_request(request):
+    return render(request, 'my_request.html') 
 
 # Improved Dashboard View to show blood group count for donors
 def donor_dashboard(request):
