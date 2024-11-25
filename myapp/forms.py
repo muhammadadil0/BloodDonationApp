@@ -32,4 +32,7 @@ class UserRegistrationForm(forms.ModelForm):
         return cleaned_data
         
 
-
+class DonationForm(forms.ModelForm):
+    class Meta:
+        model=models.BloodDonate
+        fields=['age','bloodgroup','disease','unit']

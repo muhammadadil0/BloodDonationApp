@@ -1,12 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Patient, Donor
+from .models import Patient, Donor, BloodDonate
 from django.contrib import messages
 from django.urls import reverse
 from django.db import models  # Import models to use for aggregation
 from .models import PatientRequest
 from . import forms
+
+
+
+from django.shortcuts import render
+
+def home(request):
+    return render(request, 'home.html')  # This should match the template you want to show
 
 
 # Improved Dashboard View to show blood group count for donors
@@ -144,8 +151,8 @@ def donate_blood(request):
     return render(request,'myapp/donate_blood.html',{'donation_form':donation_form})
 
 def donation_history(request):
-    donor= models.Donor.objects.get(user_id=request.user.id)
-    donations=models.BloodDonate.objects.all().filter(donor=donor)
+    donor= Donor.objects.get(user_id=request.user.id)
+    donations=BloodDonate.objects.all().filter(donor=donor)
     return render(request,'myapp/donation_history.html',{'donations':donations})
 
 

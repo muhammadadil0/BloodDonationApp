@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+from django.contrib.auth.views import LogoutView
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('admin_login/', views.admin_login, name='admin_login'),
@@ -19,4 +21,6 @@ urlpatterns = [
     path('donor_logout/', views.donor_logout, name='donor_logout'),  # Add this line for donor logout
     path('patient_dashboard/', views.patient_dashboard, name='patient_dashboard'),  # Patient dashboard
     path('patient-request/', views.patient_request_create, name='patient_request_create'),
+    
+        path('logout/', LogoutView.as_view(), name='logout'),  # Add the logout URL pattern
 ]

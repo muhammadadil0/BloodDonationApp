@@ -52,3 +52,16 @@ class PatientRequest(models.Model):
 
     def __str__(self):
         return f"Request by {self.patient_name} for {self.blood_type} blood"
+        
+        
+        
+class BloodDonate(models.Model): 
+    donor=models.ForeignKey(Donor,on_delete=models.CASCADE)   
+    disease=models.CharField(max_length=100,default="Nothing")
+    age=models.PositiveIntegerField()
+    bloodgroup=models.CharField(max_length=10)
+    unit=models.PositiveIntegerField(default=0)
+    status=models.CharField(max_length=20,default="Pending")
+    date=models.DateField(auto_now=True)
+    def __str__(self):
+        return self.donor
