@@ -6,64 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Patient Histories</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
             margin: 0;
             padding: 0;
+            color: #333;
         }
 
-        /* Header (navbar) */
+        /* Header */
         .header {
-            background-color: #ff4d4d;
+            background-color: #d32f2f;  /* Red color for navbar */
             color: #fff;
-            padding: 15px;
-            text-align: left;
-            font-size: 24px;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5em;
+            z-index: 10;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
         }
 
         .header a {
             color: #fff;
             text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
         }
 
         .header a:hover {
-            text-decoration: underline;
+            color: #c8e6c9;
+        }
+
+        .header i {
+            margin-right: 10px;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 200px;
-            background-color: #333;
+            width: 220px;
+            background-color: #263238;
             color: #fff;
             position: fixed;
-            top: 0;
+            top: 70px; /* Below header */
             bottom: 0;
             padding-top: 20px;
+            box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+            z-index: 5;
         }
 
         .sidebar a {
-            padding: 10px;
+            padding: 15px;
             text-decoration: none;
             color: #fff;
             display: block;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
         }
 
         .sidebar a:hover {
-            background-color: #575757;
+            background-color: #00796b;
         }
 
         /* Main Content Area */
         .main {
-            margin-left: 220px;
-            padding: 20px;
+            margin-left: 240px;
+            padding: 30px;
+            background-color: #fff;
+            min-height: 100vh;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 70px; /* Account for fixed header */
         }
 
         .section-header {
-            margin-top: 30px;
-            font-size: 20px;
-            color: #333;
+            font-size: 2em;
+            color: #004d40;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
 
         /* Patient Table */
@@ -71,22 +96,23 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed; /* Fixed column width */
+            table-layout: fixed;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .patient-table th, .patient-table td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-            word-wrap: break-word; /* Ensure long words wrap */
+            word-wrap: break-word;
         }
 
         .patient-table th {
-            background-color: #4CAF50;
+            background-color: #d32f2f;  /* Red color for table header */
             color: white;
+            font-size: 1.1em;
         }
 
         .patient-table tr:nth-child(even) {
@@ -94,20 +120,93 @@
         }
 
         .patient-table tr:hover {
-            background-color: #f1f1f1;
+            background-color: #e0f2f1;
         }
 
         .no-records {
             text-align: center;
-            color: #888;
+            color: #999;
             font-style: italic;
+        }
+
+        /* Status Label */
+        .label {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .success { background-color: #66bb6a; color: #fff; } /* Green */
+        .info { background-color: #29b6f6; color: #fff; }    /* Blue */
+        .danger { background-color: #e57373; color: #fff; }   /* Red */
+        .other { background-color: #e7e7e7; color: #333; }    /* Gray */
+
+        /* Blood Group Colors */
+        .blood-group {
+            padding: 6px 12px;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .A+ { background-color: #ff8a80; }
+        .B+ { background-color: #ff7043; }
+        .AB+ { background-color: #c2185b; }
+        .O+ { background-color: #8e24aa; }
+        .A- { background-color: #fbc02d; }
+        .B- { background-color: #43a047; }
+        .AB- { background-color: #00acc1; }
+        .O- { background-color: #0288d1; }
+
+        /* Button Styles */
+        .btn-update-status {
+            background-color: #00796b;
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-update-status:hover {
+            background-color: #004d40;
+        }
+
+        .status-select {
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header {
+                font-size: 1.2em;
+                padding: 10px 20px;
+            }
+
             .patient-table th, .patient-table td {
                 padding: 10px;
             }
+
             .section-header {
                 font-size: 1.5em;
             }
@@ -119,72 +218,55 @@
 <!-- Header -->
 <div class="header">
     <span>Blood Bank Management System</span>
-    <span style="float: right;"><a href="{% url 'admin_logout' %}">Logout</a></span>
+    <span><a href="{% url 'admin_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></span>
 </div>
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <a href="{% url 'home' %}">Home</a>
-    <a href="{% url 'all_donor_history' %}">Donor</a>
-    <a href="{% url 'all_patient_history' %}">Patient</a>  <!-- New link for Patient History -->
-    <a href="#">Donations</a>
-    <a href="#">Blood Requests</a>
-    <a href="#">Request History</a>
-    <a href="{% url 'blood_stock' %}">Blood Stock</a>
+    <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+    <a href="{% url 'all_donor_history' %}"><i class="fas fa-user"></i> Donor</a>
+    <a href="{% url 'all_patient_history' %}"><i class="fas fa-heartbeat"></i> Patient</a>
+    <a href="{% url 'blood_stock' %}"><i class="fas fa-tint"></i> Blood Stock</a>
 </div>
 
 <!-- Main Content -->
 <div class="main">
     <div class="section-header">All Patient Histories</div>
 
-    <table class="patient-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Patient Name</th>
-                <th>Blood Group</th>
-                <th>Diseases</th>
-                <th>Age</th>
-                <th>Units</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for patient in patients %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
-                    {% if patient.user %}
-                        {{ patient.user.username }} <!-- Display username instead of first and last name -->
-                    {% else %}
-                        No Patient Found
-                    {% endif %}
-                </td>
-                <td>{{ patient.bloodgroup }}</td>
-                <td>{{ patient.diseases }}</td>
-                <td>{{ patient.age }}</td>
-                <td>{{ patient.unit }}</td>
-                <td>{{ patient.status }}</td>
-                <td>{{ patient.date }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="8" class="no-records">No patient records found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form method="POST">
+        {% csrf_token %}
+        <table class="patient-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Patient Name</th>
+                    <th>Blood Group</th>
+                    <th>Age</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ patient.user.username }}</td>
+                    <td>{{ patient.blood_type }}</td>
+                    <td>{{ patient.age }}</td>
+                    <td>
+                        <select name="status_{{ patient.id }}" class="status-select">
+                            <option value="Approved" {% if patient.status == 'Approved' %}selected{% endif %}>Approved</option>
+                            <option value="Rejected" {% if patient.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                            <option value="Pending" {% if patient.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn-update-status">Update Status for All Patients</button>
+    </form>
 </div>
-<script>
-    function toggleBloodStock() {
-        var stockSection = document.getElementById('bloodStockSection');
-        if (stockSection.style.display === 'none') {
-            stockSection.style.display = 'block';
-        } else {
-            stockSection.style.display = 'none';
-        }
-    }
-</script>
+
 </body>
 </html>

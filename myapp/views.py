@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -14,7 +15,8 @@ from .forms import BloodRequestForm, ContactUsForm
 from django.shortcuts import render
 from django.db.models import Sum
 
-
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 
 def home(request):
     return render(request, 'home.html')  # This should match the template you want to show
@@ -53,24 +55,23 @@ def donor_dashboard(request):
 
 # Admin Dashboard View
 def admin_dashboard(request):
+    # Check if user is authenticated and a staff member
     if request.user.is_authenticated and request.user.is_staff:
-        data = {
-            'patients': Patient.objects.all(),
-            'donors': Donor.objects.all()
-        }
-        return render(request, 'myapp/admin_dashboard.html', data)
-    else:
-        messages.error(request, 'You are not authorized to access this page.')
-        return redirect('home')
+        # Redirect to 'all_donor_history' page after login
+        return redirect('all_donor_history')  # This will redirect the user to the all_donor_history page
 
+    # If the user is not authenticated or is not staff, show error
+    messages.error(request, 'You are not authorized to access this page.')
+    return redirect('home')  
 # Patient Dashboard View
 def patient_dashboard(request):
     if request.user.is_authenticated and hasattr(request.user, 'patient'):
-        data = {'patient': Patient.objects.get(user=request.user)}
-        return render(request, 'myapp/patient_dashboard.html', data)
+        # Automatically redirect to 'makerequest' view after rendering the dashboard
+        return redirect('makerequest')  # Make sure 'makerequest' is the name of your URL pattern
+        
     else:
         messages.error(request, 'You are not authorized to access this page.')
-        return redirect('home')
+        return redirect('home')  # Redirect to
 
 # Helper function to handle login for different user types
 def custom_login(request, user_type, template_name, redirect_view, check_attr):
@@ -292,18 +293,92 @@ def contact_us(request):
 
 def all_donor_history(request):
     """View all donation histories for admin."""
-    if request.user.is_authenticated and request.user.is_staff:  # Ensure the user is an admin
+    if request.user.is_authenticated and request.user.is_staff:
         donations = BloodDonate.objects.select_related('donor', 'donor__user').all()
+
+        # Check if the form has been submitted and handle the status change temporarily
+        if request.method == 'POST':
+            updated_donations = []
+            for donation in donations:
+                # Get the status from the form data
+                status = request.POST.get(f'status_{donation.id}')
+                if status:
+                    # Temporarily update the status in the context (without saving to the DB)
+                    donation.status = status
+                updated_donations.append(donation)
+
+            # Pass the updated donations back to the template to reflect the changes
+            donations = updated_donations
+        
         return render(request, 'myapp/all_donor_history.html', {'donations': donations})
+    
     messages.error(request, 'You are not authorized to access this page.')
     return redirect('home')
 
 def all_patient_history(request):
-    patients = Patient.objects.all()  # Modify as needed to filter patients
+    patients = Patient.objects.all()
+
+    # Check if the form has been submitted and handle the status change temporarily
+    if request.method == 'POST':
+        # Create a list of updated patients with their temporary status changes
+        updated_patients = []
+        for patient in patients:
+            status = request.POST.get(f'status_{patient.id}')
+            if status:
+                # Temporarily update the status in the context (without saving to the DB)
+                patient.status = status
+            updated_patients.append(patient)
+
+        # Pass the updated patients back to the template to reflect the changes
+        patients = updated_patients
+    
     return render(request, 'myapp/all_patient_history.html', {'patients': patients})
+
 
 def blood_stock_view(request):
     # Group by blood type and sum the units
     blood_stock = BloodDonate.objects.values('bloodgroup').annotate(total_units=Sum('unit')).order_by('bloodgroup')
     
     return render(request, 'myapp/blood_stock.html', {'blood_stock': blood_stock})
+
+def update_request_status(request, model_type, request_id):
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+
+        # Check if status is valid
+        valid_statuses = ['pending', 'approved', 'rejected']
+        if new_status not in valid_statuses:
+            return JsonResponse({"error": "Invalid status value"}, status=400)
+        
+        # Choose the appropriate model based on the type
+        if model_type == "patient":
+            request_instance = get_object_or_404(PatientRequest, id=request_id)
+        elif model_type == "donate":
+            request_instance = get_object_or_404(BloodDonate, id=request_id)
+        else:
+            return JsonResponse({"error": "Invalid model type. Expected 'patient' or 'donate'."}, status=400)
+
+        # Update the status
+        request_instance.status = new_status
+        request_instance.save()
+
+        # Return the updated status in the response
+        return JsonResponse({"message": "Status updated successfully", "status": request_instance.status})
+    
+    return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
+
+def update_donor_status(request, donation_id):
+    """Update donation status."""
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        status = data.get('status')
+
+        try:
+            donation = BloodDonate.objects.get(id=donation_id)
+            donation.status = status
+            donation.save()  # Save the updated status
+            print(f"Donation status updated: {donation.status}")  # Debug log
+            return JsonResponse({'message': 'Donation status updated successfully.'})
+        except BloodDonate.DoesNotExist:
+            print(f"Donation with ID {donation_id} not found")  # Debug log
+            return JsonResponse({'error': 'Donation not found.'}, status=404)

@@ -5,65 +5,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Donor Histories</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'css/styles.css' %}"> {% endcomment %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
             margin: 0;
             padding: 0;
+            color: #333;
         }
 
-        /* Header (navbar) */
+        /* Header */
         .header {
-            background-color: #ff4d4d;
+            background-color: #d32f2f;  /* Red color for navbar */
             color: #fff;
-            padding: 15px;
-            text-align: left;
-            font-size: 24px;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5em;
+            z-index: 10;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .header span:first-of-type {
+            flex-grow: 1;  /* Ensures the title spans the left */
+        }
+
+        .header span:last-of-type {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
         }
 
         .header a {
             color: #fff;
             text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
         }
 
         .header a:hover {
-            text-decoration: underline;
+            color: #c8e6c9;
+        }
+
+        .header i {
+            margin-right: 10px;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 200px;
-            background-color: #333;
+            width: 220px;
+            background-color: #263238;
             color: #fff;
             position: fixed;
-            top: 0;
+            top: 70px; /* Below header */
             bottom: 0;
             padding-top: 20px;
+            box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+            z-index: 5;
         }
 
         .sidebar a {
-            padding: 10px;
+            padding: 15px;
             text-decoration: none;
             color: #fff;
             display: block;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
         }
 
         .sidebar a:hover {
-            background-color: #575757;
+            background-color: #00796b;
         }
 
         /* Main Content Area */
         .main {
-            margin-left: 220px;
-            padding: 20px;
+            margin-left: 240px;
+            padding: 30px;
+            background-color: #fff;
+            min-height: 100vh;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 70px; /* Account for fixed header */
         }
 
         .section-header {
-            margin-top: 30px;
-            font-size: 20px;
-            color: #333;
+            font-size: 2em;
+            color: #004d40;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
 
         /* Donor Table */
@@ -71,22 +106,23 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed; /* Fixed column width */
+            table-layout: fixed;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .donor-table th, .donor-table td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-            word-wrap: break-word; /* Ensure long words wrap */
+            word-wrap: break-word;
         }
 
         .donor-table th {
-            background-color: #4CAF50;
+            background-color: #d32f2f;  /* Red color for table header */
             color: white;
+            font-size: 1.1em;
         }
 
         .donor-table tr:nth-child(even) {
@@ -94,20 +130,69 @@
         }
 
         .donor-table tr:hover {
-            background-color: #f1f1f1;
+            background-color: #e0f2f1;
         }
 
         .no-records {
             text-align: center;
-            color: #888;
+            color: #999;
             font-style: italic;
+        }
+
+        /* Button Styles */
+        .btn-update-status {
+            background-color: #00796b;
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-update-status:hover {
+            background-color: #004d40;
+        }
+
+        .status-select {
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+        }
+
+        /* Blood Group Color Styles */
+        .blood-group {
+            padding: 6px 12px;
+            border-radius: 5px;
+            color: #333; /* Set the text color to black */
+            font-weight: bold;
+            background-color: transparent; /* Remove background color */
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header {
+                font-size: 1.2em;
+                padding: 10px 20px;
+            }
+
             .donor-table th, .donor-table td {
                 padding: 10px;
             }
+
             .section-header {
                 font-size: 1.5em;
             }
@@ -119,72 +204,68 @@
 <!-- Header -->
 <div class="header">
     <span>Blood Bank Management System</span>
-    <span style="float: right;"><a href="{% url 'admin_logout' %}">Logout</a></span>
+    <span><a href="{% url 'admin_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></span>
 </div>
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <a href="{% url 'home' %}">Home</a>
-    <a href="{% url 'all_donor_history' %}">Donor</a>
-    <a href="{% url 'all_patient_history' %}">Patient</a>
-    <a href="#">Donations</a>
-    <a href="#">Blood Requests</a>
-    <a href="#">Request History</a>
-    <a href="{% url 'blood_stock' %}">Blood Stock</a>
+    <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+    <a href="{% url 'all_donor_history' %}"><i class="fas fa-user"></i> Donor</a>
+    <a href="{% url 'all_patient_history' %}"><i class="fas fa-heartbeat"></i> Patient</a>
+    <a href="{% url 'blood_stock' %}"><i class="fas fa-tint"></i> Blood Stock</a>
 </div>
 
 <!-- Main Content -->
 <div class="main">
     <div class="section-header">All Donor Histories</div>
 
-    <table class="donor-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Donor Name</th>
-                <th>Blood Group</th>
-                <th>Disease</th>
-                <th>Age</th>
-                <th>Units</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for donation in donations %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
-                    {% if donation.donor and donation.donor.user %}
-                        {{ donation.donor.user.username }} <!-- Display username instead of first and last name -->
-                    {% else %}
-                        No Donor Found
-                    {% endif %}
-                </td>
-                <td>{{ donation.bloodgroup }}</td>
-                <td>{{ donation.disease }}</td>
-                <td>{{ donation.age }}</td>
-                <td>{{ donation.unit }}</td>
-                <td>{{ donation.status }}</td>
-                <td>{{ donation.date }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="8" class="no-records">No donation records found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form method="POST">
+        {% csrf_token %}
+        <table class="donor-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Donor Name</th>
+                    <th>Blood Group</th>
+                    <th>Age</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in donations %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        {% if donation.donor and donation.donor.user %}
+                            {{ donation.donor.user.username }}
+                        {% else %}
+                            No Donor Found
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="blood-group">{{ donation.bloodgroup }}</span>
+                    </td>
+                    <td>{{ donation.age }}</td>
+                    <td>
+                        <select id="status-{{ donation.id }}" name="status_{{ donation.id }}" class="status-select">
+                            <option value="pending" {% if donation.status == "pending" %}selected{% endif %}>Pending</option>
+                            <option value="approved" {% if donation.status == "approved" %}selected{% endif %}>Approved</option>
+                        </select>
+                    </td>
+                    <td>{{ donation.date }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="no-records">No donation records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn-update-status">Update Status for All Donors</button>
+    </form>
 </div>
-<script>
-    function toggleBloodStock() {
-        var stockSection = document.getElementById('bloodStockSection');
-        if (stockSection.style.display === 'none') {
-            stockSection.style.display = 'block';
-        } else {
-            stockSection.style.display = 'none';
-        }
-    }
-</script>
+
 </body>
 </html>

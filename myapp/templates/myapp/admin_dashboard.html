@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blood Bank Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,46 +14,83 @@
             margin: 0;
             padding: 0;
         }
+        /* Header */
         .header {
-            background-color: #ff4d4d;
+            background-color: #d32f2f;  /* Red color for navbar */
             color: #fff;
-            padding: 15px;
-            text-align: left;
-            font-size: 24px;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5em;
+            z-index: 10;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
         }
+        .header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .header a:hover {
+            color: #c8e6c9;
+        }
+
+        .header i {
+            margin-right: 10px;
+        }
+
         .sidebar {
-            width: 200px;
-            background-color: #333;
+            width: 220px;
+            background-color: #263238;
             color: #fff;
             position: fixed;
-            top: 0;
+            top: 70px; /* Below header */
             bottom: 0;
             padding-top: 20px;
+            box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+            z-index: 5;
         }
+
         .sidebar a {
-            padding: 10px;
+            padding: 15px;
             text-decoration: none;
             color: #fff;
             display: block;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
         }
+
         .sidebar a:hover {
-            background-color: #575757;
+            background-color: #00796b;
         }
+
+        .sidebar i {
+            font-size: 20px; /* Adjust icon size */
+            margin-right: 10px; /* Space between icon and text */
+        }
+
         .main {
             margin-left: 220px;
             padding: 20px;
         }
+
         .section-header {
             margin-top: 30px;
             font-size: 20px;
             color: #333;
         }
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
+
         .card {
             background-color: #fff;
             padding: 20px;
@@ -59,10 +98,12 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .blood-type {
             font-size: 24px;
             font-weight: bold;
         }
+
         .metric {
             display: flex;
             align-items: center;
@@ -70,9 +111,65 @@
             font-size: 16px;
             margin-top: 5px;
         }
+
         .metric .icon {
             font-size: 20px;
             color: #ff4d4d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e33e3e;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header {
+                font-size: 1.2em;
+                padding: 10px 20px;
+            }
+
+            .patient-table th, .patient-table td {
+                padding: 10px;
+            }
+
+            .section-header {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
@@ -84,27 +181,24 @@
 </div>
 
 <div class="sidebar">
-    <a href="{% url 'home' %}">Home</a>
-    <a href="{% url 'all_donor_history' %}">Donor</a>
-    <a href="{% url 'all_patient_history' %}">Patient</a>
-    <a href="{% url 'blood_stock' %}">Blood Stock</a><!-- Added JavaScript toggle -->
-    <a href="#">Donations</a>
-    <a href="#">Blood Requests</a>
-    <a href="#">Request History</a>
+    <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+    <a href="{% url 'all_donor_history' %}"><i class="fas fa-user"></i> Donor</a>
+    <a href="{% url 'all_patient_history' %}"><i class="fas fa-heartbeat"></i> Patient</a>
+    <a href="{% url 'blood_stock' %}"><i class="fas fa-tint"></i> Blood Stock</a>
 </div>
 
 <div class="main">
+    <!-- Blood Stock Section -->
     <div class="section-header">Blood Stock</div>
-
-    <!-- Blood Stock Total Section - Initially hidden -->
-    <div id="bloodStockSection" style="display: none;">
-        <div class="section-header">Total Blood Stock</div>
+    <div id="bloodStockSection">
         <div class="card-grid">
             {% for blood_type, count in blood_stock.items %}
                 <div class="card">
                     <div class="blood-type">{{ blood_type }}</div>
-                    <div class="icon">💉</div>
-                    <div>{{ count }}</div>
+                    <div class="metric">
+                        <span>{{ count }}</span>
+                        <span class="icon">💉</span>
+                    </div>
                 </div>
             {% empty %}
                 <p>No blood stock data available.</p>
@@ -112,6 +206,7 @@
         </div>
     </div>
 
+    <!-- Donor Section -->
     <div class="section-header">Donor Section</div>
     <div class="card-grid">
         <div class="card">
@@ -130,34 +225,62 @@
         </div>
     </div>
 
-    <div class="section-header">Patient Section</div>
-    <div class="card-grid">
-        <div class="card">
-            <div>Total Requests</div>
-            <div class="metric">
-                <span>{{ total_requests }}</span>
-                <span class="icon">🔄</span>
-            </div>
-        </div>
-        <div class="card">
-            <div>Approved Requests</div>
-            <div class="metric">
-                <span>{{ approved_requests }}</span>
-                <span class="icon">✔️</span>
-            </div>
-        </div>
-    </div>
+    <!-- Patient Section -->
+    <div class="section-header">Patient Requests</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Blood Type</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in patient_requests %}
+            <tr>
+                <td>{{ request.patient_name }}</td>
+                <td>{{ request.blood_type }}</td>
+                <td>{{ request.contact_number }}</td>
+                <td>
+                    <select id="status-{{ request.id }}">
+                        <option value="pending" {% if request.status == "pending" %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if request.status == "approved" %}selected{% endif %}>Approved</option>
+                    </select>
+                </td>
+                <td>
+                    <button onclick="updateStatus('patient', {{ request.id }})">Update</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<!-- Add this script to toggle visibility of the blood stock section -->
+<!-- JavaScript File -->
 <script>
-    function toggleBloodStock() {
-        var stockSection = document.getElementById('bloodStockSection');
-        if (stockSection.style.display === 'none') {
-            stockSection.style.display = 'block';
-        } else {
-            stockSection.style.display = 'none';
-        }
+    function updateStatus(modelType, requestId) {
+        const status = document.getElementById(`status-${requestId}`).value;
+
+        fetch(`/update-status/${modelType}/${requestId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                location.reload(); // Reload to see updated status
+            } else {
+                alert('Error updating status');
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>
 

@@ -35,4 +35,7 @@ urlpatterns = [
 
     # Default Logout (For non-specific users)
     path('logout/', LogoutView.as_view(), name='logout'),
+     path('update-status/<str:model_type>/<int:request_id>/', views.update_request_status, name='update_status'),
+     path('update-donor-status/<int:donation_id>/', views.update_donor_status, name='update_donor_status'),
+     path('makerequest/', views.make_request, name='makerequest'),
 ]
