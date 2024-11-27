@@ -11,7 +11,7 @@ from .models import PatientRequest
 from . import forms
 
 from .forms import BloodRequestForm, ContactUsForm 
-
+import re  # for regex
 from django.shortcuts import render
 from django.db.models import Sum
 
@@ -311,9 +311,19 @@ def contact_us(request):
 def all_donor_history(request):
     """View all donation histories for admin."""
     if request.user.is_authenticated and request.user.is_staff:
+    # when i click on donor, the request go to url and from there request go to view, in view all donors (.all()) data is stored in donations and then this donation is used in the html code and fetch or print data on the dashboard. BloodDonate -> this is the model or table we have in database and from there we actually fetch data of the donors.
         donations = BloodDonate.objects.select_related('donor', 'donor__user').all()
 
-        # Check if the form has been submitted and handle the status change temporarily
+        # Check if there's a search query and filter by donor name using regex
+        # The 'search' in request.GET.get('search', '') corresponds to the name attribute of the <input> element in your HTML form:
+        search_query = request.GET.get('search', '')
+        if search_query:
+            # Use regex to filter donations based on donor name
+            donations = donations.filter(
+                donor__user__username__iregex=fr'.*{re.escape(search_query)}.*'
+            )
+
+        # Handle form submission for status update
         if request.method == 'POST':
             updated_donations = []
             for donation in donations:
@@ -327,17 +337,28 @@ def all_donor_history(request):
             # Pass the updated donations back to the template to reflect the changes
             donations = updated_donations
         
-        return render(request, 'myapp/all_donor_history.html', {'donations': donations})
+        return render(request, 'myapp/all_donor_history.html', {'donations': donations, 'search_query': search_query})
     
     messages.error(request, 'You are not authorized to access this page.')
     return redirect('home')
-
+    
+    
+    
 def all_patient_history(request):
     patients = Patient.objects.all()
 
+    # Get search query from the request
+    # request.GET.get('search', '') this retrive the search value from the url all_patient_history
+    search_query = request.GET.get('search', '').strip()
+
+    if search_query:
+        # Use regex to search by patient name (case-insensitive)
+        patients = patients.filter(
+            user__username__iregex=fr'.*{re.escape(search_query)}.*'
+        )
+
     # Check if the form has been submitted and handle the status change temporarily
     if request.method == 'POST':
-        # Create a list of updated patients with their temporary status changes
         updated_patients = []
         for patient in patients:
             status = request.POST.get(f'status_{patient.id}')
@@ -348,7 +369,7 @@ def all_patient_history(request):
 
         # Pass the updated patients back to the template to reflect the changes
         patients = updated_patients
-    
+
     return render(request, 'myapp/all_patient_history.html', {'patients': patients})
 
 

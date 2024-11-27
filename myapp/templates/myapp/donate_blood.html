@@ -1,5 +1,6 @@
 {% extends 'myapp/donorbase.html' %}
 {% block content %}
+<<<<<<< HEAD
 {% load static %}
 <head>
     <!-- Font special for pages -->
@@ -64,6 +65,112 @@
                     </form>
                 </div>
             </div>
+=======
+{% load widget_tweaks %}
+{% load static %}
+
+<head>
+    <!-- Font special for pages -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" media="all">
+
+    <!-- Additional Custom Styles -->
+    <style>
+        .form-container {
+            max-width: 700px;  /* Increased width */
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;  /* Increased padding */
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 30px;  /* Increased bottom margin */
+            font-size: 28px;  /* Increased font size */
+            color: #333;
+        }
+
+        .form-container label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 12px;  /* Increased margin */
+            color: #555;
+            font-size: 16px;  /* Increased font size */
+        }
+
+        .form-container select,
+        .form-container input {
+            width: 100%;
+            padding: 15px;  /* Increased padding */
+            margin-bottom: 25px;  /* Increased bottom margin */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;  /* Increased font size */
+        }
+
+        .form-container select {
+            appearance: none;
+        }
+
+        .form-container button {
+            display: block;
+            width: 100%;
+            padding: 15px;  /* Increased padding */
+            background-color: #d9534f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;  /* Increased font size */
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+
+<div class="page-wrapper bg-gra-03 p-t-45 p-b-50">
+    <div class="wrapper wrapper--w790">
+        <div class="form-container">
+            <h2>Donate Blood</h2>
+            <form method="POST" autocomplete="off" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Blood Group -->
+                <label for="bloodgroup">Blood Group</label>
+                <select name="bloodgroup" id="bloodgroup" required>
+                    <option value="" disabled selected>Choose your blood group</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
+
+                <!-- Unit in ml -->
+                <label for="unit">Unit (ml)</label>
+                {% render_field donation_form.unit|attr:"class:form-control, placeholder: 'Enter amount in ml'" %}
+
+                <!-- Disease -->
+                <label for="disease">Disease (if any)</label>
+                {% render_field donation_form.disease|attr:"class:form-control, placeholder: 'Mention any disease or enter \"None\"'" %}
+
+                <!-- Age -->
+                <label for="age">Age</label>
+                {% render_field donation_form.age|attr:"class:form-control, placeholder: 'Enter your age'" %}
+
+                <!-- Submit Button -->
+                <button type="submit">Donate</button>
+            </form>
+>>>>>>> d63e0f23d053306dc50305f674e801c87cb9c081
         </div>
     </div>
 </div>
@@ -71,3 +178,4 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock content %}
+

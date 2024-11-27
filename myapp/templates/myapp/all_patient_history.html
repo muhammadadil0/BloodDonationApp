@@ -233,6 +233,12 @@
 <div class="main">
     <div class="section-header">All Patient Histories</div>
 
+
+    <!-- Search Form  -->
+    <form method="GET" action="{% url 'all_patient_history' %}" style="margin-bottom: 20px;">
+        <input type="text" name="search" placeholder="Search by patient name" value="{{ request.GET.search }}" style="padding: 10px; font-size: 1em;">
+        <button type="submit" class="btn-update-status" style="padding: 10px; font-size: 1em;">Search</button>
+    </form>
     <form method="POST">
         {% csrf_token %}
         <table class="patient-table">
