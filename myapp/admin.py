@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Patient, Donor
+from .models import ContactUs, Patient, Donor
 
 class PatientAdmin(admin.ModelAdmin):
     list_display = ('user', 'blood_type', 'contact_number', 'address', 'age', 'date_of_birth', 'gender')
@@ -14,3 +14,4 @@ class DonorAdmin(admin.ModelAdmin):
 # Register models with custom admins
 admin.site.register(Patient, PatientAdmin)
 admin.site.register(Donor, DonorAdmin)
+admin.site.register(ContactUs)

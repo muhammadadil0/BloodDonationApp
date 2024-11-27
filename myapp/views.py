@@ -42,14 +42,31 @@ def my_request(request):
     return render(request, 'myapp/my_request.html', {'makerequest': makerequest})
 
 # Improved Dashboard View to show blood group count for donors
+# def donor_dashboard(request):
+#     if request.user.is_authenticated and hasattr(request.user, 'donor'):
+#         # Get all donors and count blood groups
+#         blood_groups = Donor.objects.values('blood_type').annotate(count=models.Count('blood_type'))
+#         donor_data = {'blood_groups': blood_groups}
+
+#         return render(request, 'myapp/donor_dashboard.html', donor_data)
+#     else:
+#         messages.error(request, 'You are not authorized to access this page.')
+#         return redirect('home')
+
 def donor_dashboard(request):
     if request.user.is_authenticated and hasattr(request.user, 'donor'):
+        # Redirect to donate_blood page
+        return redirect('donate_blood')  # Replace 'donate_blood' with the actual URL name
+        
+        # Alternatively, you can comment out the redirect if you want to show data first:
         # Get all donors and count blood groups
         blood_groups = Donor.objects.values('blood_type').annotate(count=models.Count('blood_type'))
         donor_data = {'blood_groups': blood_groups}
-
-        return render(request, 'myapp/donor_dashboard.html', donor_data)
+        
+        # Render the donor_dashboard with donor data (if no redirection is applied)
+        # return render(request, 'myapp/donor_dashboard.html', donor_data)
     else:
+        # If not authenticated, redirect to the home page
         messages.error(request, 'You are not authorized to access this page.')
         return redirect('home')
 
