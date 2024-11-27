@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin_login/', views.admin_login, name='admin_login'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin_logout/', views.admin_logout, name='admin_logout'),
-
+    path('admin_logout/', views.admin_logout, name='admin_logout'),
     # Donor URLs
     path('donor_login/', views.donor_login, name='donor_login'),
     path('donor_register/', views.donor_register, name='donor_register'),

@@ -25,6 +25,7 @@ class Person(models.Model):
 
 
 class Patient(models.Model):
+    status = models.CharField(max_length=100, null=True, blank=True)  #
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     blood_type = models.CharField(max_length=3)
     contact_number = models.CharField(max_length=15)

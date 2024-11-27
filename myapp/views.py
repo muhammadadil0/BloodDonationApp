@@ -226,12 +226,13 @@ def patient_register(request):
 
         # Create and save a new Patient instance
         Patient.objects.create(
-            user=user,
-            blood_type=blood_type,
-            contact_number=contact_number,
-            address=address,
-            age=age
-        )
+          user=user,
+          blood_type=blood_type,
+          contact_number=contact_number,
+          address=address,
+          age=age,
+          status='pending'  # Add the status here
+       )
 
         # After successful registration, redirect to login page
         messages.success(request, 'Registration successful! Please log in.')
@@ -366,6 +367,14 @@ def update_request_status(request, model_type, request_id):
         return JsonResponse({"message": "Status updated successfully", "status": request_instance.status})
     
     return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
+
+def admin_logout(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        logout(request)
+        return redirect('admin_login')  # Redirect to the admin login page
+    else:
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('home')  # Redirect to the home page
 
 def update_donor_status(request, donation_id):
     """Update donation status."""
