@@ -218,9 +218,16 @@
 <!-- Main Content -->
 <div class="main">
     <div class="section-header">All Donor Histories</div>
+<!-- {% url 'all_donor_history' %} this call (get request ) go to the all_donor_history view with the query -->
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'all_donor_history' %}" style="margin-bottom: 20px;">
+        <input type="text" name="search" placeholder="Search by donor name" value="{{ search_query }}" style="padding: 10px; font-size: 1em;">
+        <button type="submit" class="btn-update-status" style="padding: 10px; font-size: 1em;">Search</button>
+    </form>
 
     <form method="POST">
         {% csrf_token %}
+        <!-- from here all the patient data is displayed-->
         <table class="donor-table">
             <thead>
                 <tr>
@@ -266,6 +273,7 @@
         <button type="submit" class="btn-update-status">Update Status for All Donors</button>
     </form>
 </div>
+
 
 </body>
 </html>
